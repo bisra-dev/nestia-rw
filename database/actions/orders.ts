@@ -30,6 +30,18 @@ export async function createOrder(formData: FormData) {
 
     //Order confimation email
     try {
+      const appUrl = process.env.APP_URL
+        ? process.env.APP_URL.replace(/\/$/, "")
+        : process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+          : process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : null;
+
+      if (!appUrl) {
+        throw new Error("APP_URL is not configured");
+      }
+
       await resend.emails.send({
         from: "Nestia Furniture <onboarding@resend.dev>",
         to: newOrder.associatedEmail,
@@ -38,7 +50,7 @@ export async function createOrder(formData: FormData) {
           id: newOrder.id,
             fullName: newOrder.fullName,
           associatedEmail: newOrder.associatedEmail,
-          Url: `${process.env.APP_URL ?? "http://localhost:3000"}/root?id=${encodeURIComponent(newOrder.id)}&email=${encodeURIComponent(newOrder.associatedEmail)}`,
+          Url: `${appUrl}/root?id=${encodeURIComponent(newOrder.id)}&email=${encodeURIComponent(newOrder.associatedEmail)}`,
         }),
       });
     } catch (emailError) {
