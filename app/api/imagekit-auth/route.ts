@@ -1,0 +1,17 @@
+import { getUploadAuthParams } from "@imagekit/next/server";
+
+export const dynamic = "force-dynamic"; 
+
+export async function GET() {
+  const { token, expire, signature } = getUploadAuthParams({
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  });
+
+  return Response.json({
+    token,
+    expire,
+    signature,
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  });
+}
