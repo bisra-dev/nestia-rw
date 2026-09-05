@@ -38,7 +38,7 @@ export async function createOrder(formData: FormData) {
           id: newOrder.id,
             fullName: newOrder.fullName,
           associatedEmail: newOrder.associatedEmail,
-            Url: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/root?id=${encodeURIComponent(newOrder.id)}&email=${encodeURIComponent(newOrder.associatedEmail)}`,
+          Url: `${process.env.APP_URL ?? "http://localhost:3000"}/root?id=${encodeURIComponent(newOrder.id)}&email=${encodeURIComponent(newOrder.associatedEmail)}`,
         }),
       });
     } catch (emailError) {
