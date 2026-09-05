@@ -67,10 +67,10 @@ export const Email = ({ id, associatedEmail, fullName, Url }: WelcomeEmailProps)
               <Text className="text-[13px] text-[#6b7280] m-0 leading-relaxed">
                 Need help? Contact us at{' '}
                 <Link
-                  href={`mailto:${Url}`}
+                  href={`mailto:${associatedEmail}`}
                   className="text-[#2563eb] underline"
                 >
-                  SupportEmail
+                  {associatedEmail}
                 </Link>
                 .
               </Text>
