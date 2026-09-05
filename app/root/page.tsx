@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Suspense } from "react";
 import useSWR from "swr";
 import { getOrderForUser } from "@/database/actions/orders";
 
@@ -24,8 +25,8 @@ interface Order {
   description: string;
   buildPhotographyUrl: string | null;
   status: OrderStatus;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -44,7 +45,7 @@ const getStepIndex = (status: string) => {
   return 2; 
 };
 
-export default function TrackingTimelinePage() {
+function TrackingTimelineContent() {
   const [isOpen, setIsOpen] = useState(false);
 
    const router = useRouter();
@@ -58,22 +59,21 @@ export default function TrackingTimelinePage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const email = searchParams.get("email");
-  const fullName = searchParams.get("fullName");
 
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(Boolean(id && email));
+  const [error, setError] = useState<string | null>(
+    id && email ? null : "Missing order reference or email."
+  );
 
   useEffect(() => {
     if (!id || !email) {
-      setError("Missing order reference or email.");
-      setLoading(false);
       return;
     }
 
     getOrderForUser(id, email).then((result) => {
       if (result.success && result.data) {
-        setOrder(result.data as Order);
+        setOrder(result.data);
       } else {
         setError(result.error || "Order not found.");
       }
@@ -297,5 +297,19 @@ export default function TrackingTimelinePage() {
 
       </div>
     </main>
+  );
+}
+
+export default function TrackingTimelinePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center bg-[#FBFBFA]">
+          <ClassicLoader />
+        </main>
+      }
+    >
+      <TrackingTimelineContent />
+    </Suspense>
   );
 }

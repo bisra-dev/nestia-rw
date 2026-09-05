@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ActiveOrderLog } from "./OverviewDashboard";
 import { createOrder, deleteOrder, updateOrder } from "@/database/actions/orders";
 import { BuildPhotoUpload } from "@/components/BuildPhotoUpload";
@@ -23,29 +23,15 @@ export default function OrderManagementDrawer({
   onClose, 
 }: OrderManagementDrawerProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  
-  const [formOrderId, setFormOrderId] = useState("");
-  const [formEmail, setFormEmail] = useState("");
-  const [formDesc, setFormDesc] = useState("");
-  const [formStatus, setFormStatus] = useState<"Frame" | "Upholstery" | "Finished">("Frame");
+  const [formOrderId] = useState(
+    () => activeOrder?.id ?? `ORD-${Math.floor(1000 + Math.random() * 9000)}`
+  );
+  const [formEmail, setFormEmail] = useState(activeOrder?.email ?? "");
+  const [formDesc, setFormDesc] = useState(activeOrder?.description ?? "");
+  const [formStatus, setFormStatus] = useState<"Frame" | "Upholstery" | "Finished">(
+    activeOrder?.status ?? "Frame"
+  );
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (activeOrder) {
-      setFormOrderId(activeOrder.id);
-      setFormEmail(activeOrder.email);
-      setFormDesc(activeOrder.description);
-      setFormStatus(activeOrder.status);
-      setPhotoUrl(null); 
-    } else {
-      const generatedCode = `ORD-${Math.floor(1000 + Math.random() * 9000)}`; 
-      setFormOrderId(`${generatedCode}`);
-      setFormEmail("");
-      setFormDesc("");
-      setFormStatus("Frame");
-      setPhotoUrl(null);
-    }
-  }, [activeOrder]);
 
   const handleFormSubmission = async (formData: FormData) => {
     formData.append('status', formStatus);

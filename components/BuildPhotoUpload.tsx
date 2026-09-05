@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Image, upload } from "@imagekit/next";
+import { upload } from "@imagekit/next";
 import { useRef, useState } from "react";
 
 interface BuildPhotoUploadProps {
@@ -35,7 +35,6 @@ export function BuildPhotoUpload({ onUploadSuccess }: BuildPhotoUploadProps) {
         expire: auth.expire,
         token: auth.token,
         folder: "/build-photography",
-        urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
         onProgress: (event) => {
           setProgress(Math.round((event.loaded / event.total) * 100));
         },

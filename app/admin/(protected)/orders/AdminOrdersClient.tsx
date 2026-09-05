@@ -38,10 +38,10 @@ export default function AdminOrdersClient({
       />
       {drawerOpen && (
         <OrderManagementDrawer
+          key={activeOrder?.id ?? "new-order"}
           activeOrder={activeOrder}
           onClose={handleClose}
           onSave={() => {}} 
-          fullScreen={false}
         />
       )}
     </>

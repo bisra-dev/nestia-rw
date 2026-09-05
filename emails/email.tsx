@@ -2,10 +2,12 @@ import { Html, Head, Body, Container, Text, Button, Tailwind, Section, Link, Row
 
 interface WelcomeEmailProps {
   id: string;
+  fullName: string;
+  associatedEmail: string;
   Url: string;
 }
 
-export const Email = ({ id, Url }: WelcomeEmailProps) => {
+export const Email = ({ id, associatedEmail, fullName, Url }: WelcomeEmailProps) => {
   return (
     <Html>
       <Head />
@@ -22,7 +24,7 @@ export const Email = ({ id, Url }: WelcomeEmailProps) => {
             </Section>
             <Section className="p-6">
               <Text className="text-[16px] text-black m-0 mb-4 leading-snug">
-                Hello Israel
+                Hello {fullName}
               </Text>
               <Text className="text-base text-slate-600 leading-relaxed mb-6">
                  Thank you for choosing us to style your home! Your order is officially confirmed. 

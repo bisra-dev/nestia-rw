@@ -63,6 +63,7 @@ export default function NewOrderPage() {
                 <input
                   name="fullName"
                   type="text"
+                  required
                   value={formName}
                   placeholder="Full Name"
                   onChange={(e) => setFormName(e.target.value)}

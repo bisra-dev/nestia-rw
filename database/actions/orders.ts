@@ -10,12 +10,14 @@ import { Email } from "@/emails/email";
 import { FinishedOrderEmail } from "@/emails/finished/Finished";
 import StatusUpdateEmail from "@/emails/status/email";
 
+type OrderStatus = "Frame" | "Upholstery" | "Finished";
+
 export async function createOrder(formData: FormData) {
   try {
     const FullName = formData.get('fullName') as string;
-    const email = formData.get('email') as string;
+    const email = (formData.get('email') as string).trim().toLowerCase();
     const description = formData.get('description') as string;
-    const status = formData.get('status') as any || 'Frame';
+    const status = (formData.get('status') as OrderStatus | null) || 'Frame';
     const buildPhotographyUrl = (formData.get('buildPhotographyUrl') as string) || null;
 
     const [newOrder] = await db.insert(orders).values({
@@ -34,8 +36,9 @@ export async function createOrder(formData: FormData) {
         subject: `Order confirmed — #${newOrder.id}`,
         react: Email({
           id: newOrder.id,
+            fullName: newOrder.fullName,
           associatedEmail: newOrder.associatedEmail,
-          Url: `https://yourdomain.com/orders/${newOrder.id}`,
+            Url: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/root?id=${encodeURIComponent(newOrder.id)}&email=${encodeURIComponent(newOrder.associatedEmail)}`,
         }),
       });
     } catch (emailError) {
@@ -122,9 +125,9 @@ export async function getAllOrders() {
 
 export async function updateOrder(orderId: string, formData: FormData) {
   try {
-    const email = formData.get('email') as string;
+    const email = (formData.get('email') as string).trim().toLowerCase();
     const description = formData.get('description') as string;
-    const status = formData.get('status') as any;
+    const status = formData.get('status') as OrderStatus;
     const newPhotoUrl = formData.get('buildPhotographyUrl') as string | null;
 
     const [existingOrder] = await db
@@ -132,7 +135,7 @@ export async function updateOrder(orderId: string, formData: FormData) {
       .from(orders)
       .where(eq(orders.id, orderId));
 
-    const updateData: Record<string, any> = {
+    const updateData: Partial<typeof orders.$inferInsert> = {
       associatedEmail: email,
       description: description,
       status: status,
