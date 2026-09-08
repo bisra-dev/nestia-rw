@@ -9,7 +9,7 @@ async function seed() {
     name: "Israel Habimana",
     email: "admin@nestia.com",
     passwordHash,
-    role: "admin",
+    role: "boss",
   });
 
   console.log("Admin created.");

@@ -7,6 +7,8 @@ import { createOrder } from "@/database/actions/orders";
 import { BuildPhotoUpload } from "@/components/BuildPhotoUpload";
 import { toast } from "sonner";
 
+const initialFormKey = "new-order-form";
+
 export default function NewOrderPage() {
   const router = useRouter(); 
   const [formId, setFormId] = useState("");
@@ -15,6 +17,7 @@ export default function NewOrderPage() {
   const [formDesc, setFormDesc] = useState("");
   const [formStatus, setFormStatus] = useState<"Frame" | "Upholstery" | "Finished">("Frame");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoUploadKey, setPhotoUploadKey] = useState(initialFormKey);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFormSubmission = async (formData: FormData) => {
@@ -29,6 +32,13 @@ export default function NewOrderPage() {
     setIsSubmitting(false);
 
     if (result.success) {
+      setFormId("");
+      setFormName("");
+      setFormEmail("");
+      setFormDesc("");
+      setFormStatus("Frame");
+      setPhotoUrl(null);
+      setPhotoUploadKey((current) => `${current}-reset`);
       toast.success(`Order successfully saved!`);
       router.push("/admin/orders");
     } else {
@@ -107,7 +117,7 @@ export default function NewOrderPage() {
                   Photography
                 </label>
                 <div className="border-2 border-dashed border-[#DCDAD4] rounded-xl p-4 pt-8 pb-6 text-center bg-[#FAF9F6] relative hover:bg-[#F4F2EE] transition-colors">
-                  <BuildPhotoUpload onUploadSuccess={(url) => setPhotoUrl(url)} />
+                  <BuildPhotoUpload key={photoUploadKey} onUploadSuccess={(url) => setPhotoUrl(url)} />
                 </div>
               </div>
             </div>

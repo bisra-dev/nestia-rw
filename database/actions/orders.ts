@@ -70,6 +70,22 @@ export async function getOrders() {
   }
 }
 
+export async function getActiveOrder() {
+  try {
+    const [activeOrder] = await db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(eq(orders.status, 'Frame'))
+      .orderBy(desc(orders.createdAt))
+      .limit(1);
+
+    return { success: true, data: activeOrder?.id ?? null };
+  } catch (error) {
+    console.error('Active order fetch error:', error);
+    return { success: false, error: 'Failed to retrieve the active order.', data: null };
+  }
+}
+
 
 // delete order
 export async function deleteOrder(orderId: string) {
@@ -183,7 +199,7 @@ export async function updateOrder(orderId: string, formData: FormData) {
         const [gm] = await db
           .select({ email: admins.email })
           .from(admins)
-          .where(eq(admins.role, 'admin'));
+          .where(eq(admins.role, 'boss'));
 
         if (gm?.email) {
           await resend.emails.send({
@@ -200,7 +216,7 @@ export async function updateOrder(orderId: string, formData: FormData) {
             }),
           });
         } else {
-          console.error('No admin with role "admin" found — GM email not sent');
+          console.error('No admin with role "boss" found — GM email not sent');
         }
       } catch (emailError) {
         console.error('General manager email failed to send:', emailError);

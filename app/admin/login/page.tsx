@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, LockKeyhole, Mail } from "lucide-react";
+import { getHomeRouteForRole } from "@/lib/admin-access";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -30,12 +31,13 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin");
+    const data = await res.json();
+    router.push(getHomeRouteForRole(data.admin?.role));
     router.refresh();
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fff] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-lg rounded-lg bg-gray-200 p-12 shadow-sm shadow-[#16171C]"

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
+import { isRouteAllowedForRole, getHomeRouteForRole } from "@/lib/admin-access";
 import { ADMIN_COOKIE_NAME } from "@/lib/session";
 
 export async function proxy(req: NextRequest) {
@@ -11,17 +12,22 @@ export async function proxy(req: NextRequest) {
 
   if (isLoginRoute) {
     if (session) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+      return NextResponse.redirect(new URL(getHomeRouteForRole(session.role), req.url));
     }
-    return NextResponse.next();
+
+    const response = NextResponse.next();
+    if (token) {
+      response.cookies.delete(ADMIN_COOKIE_NAME);
+    }
+    return response;
   }
 
   if (!session) {
     return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
-  if (pathname.startsWith("/admin/settings") && session.role !== "admin") {
-    return NextResponse.redirect(new URL("/admin", req.url));
+  if (!isRouteAllowedForRole(session.role, pathname)) {
+    return NextResponse.redirect(new URL(getHomeRouteForRole(session.role), req.url));
   }
 
   return NextResponse.next();

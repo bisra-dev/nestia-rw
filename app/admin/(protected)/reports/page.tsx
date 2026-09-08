@@ -1,5 +1,6 @@
 
 import { getAllOrders } from "@/database/actions/orders";
+import { getApprovedRequisitions } from "@/database/actions/requisitions";
 import { BookCheck, ChartSpline, CircleStar, ListOrdered } from "lucide-react";
 
 interface Order {
@@ -20,7 +21,9 @@ const STATUS_ORDER = ["Frame", "Upholstery", "Finished"] as const;
 
 export default async function ReportsPage() {
   const result = await getAllOrders();
+  const approvedResult = await getApprovedRequisitions();
   const rawOrders = result.success ? result.data : [];
+  const approvedRequisitions = approvedResult.success ? approvedResult.data : [];
 
   const orders: Order[] = rawOrders.map((o) => ({
     id: o.id,
@@ -29,6 +32,24 @@ export default async function ReportsPage() {
     status: o.status,
     date: new Date(o.createdAt).toISOString().split("T")[0],
   }));
+
+  const approvedMaterials = approvedRequisitions.flatMap((requisition) =>
+    requisition.items.map((item) => ({
+      carpenterName: requisition.carpenterName,
+      approvedAt: requisition.approvedAt
+        ? new Date(requisition.approvedAt).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "N/A",
+      itemName: item.itemName,
+      quantity: item.quantity,
+      unit: item.unit,
+    }))
+  );
 
   const totalOrders = orders.length;
   const inProgress = orders.filter((o) => o.status !== "Finished").length;
@@ -105,6 +126,41 @@ export default async function ReportsPage() {
               );
             })}
           </div>
+        </div>
+
+        <div className="bg-white mt-12 rounded-xl border border-[#EAE7E1] p-8">
+          <p className="text-lg text-[#16171C] font-semibold mb-8">
+            Approved Materials
+          </p>
+
+          {approvedMaterials.length === 0 ? (
+            <p className="text-sm text-[#5C564E]">No approved materials yet.</p>
+          ) : (
+            <div className="mt-2 hidden overflow-hidden rounded-lg border border-[#D9CFBE] sm:block">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="border-b border-[#D9CFBE] bg-[#EFE7D8] text-left text-[#5C5346]">
+                    <th className="px-4 py-3 font-medium">Carpenter</th>
+                    <th className="px-4 py-3 font-medium">Item</th>
+                    <th className="w-32 px-4 py-3 font-medium">Quantity</th>
+                    <th className="w-36 px-4 py-3 font-medium">Unit</th>
+                    <th className="w-48 px-4 py-3 font-medium">Approved at</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {approvedMaterials.map((material, index) => (
+                    <tr key={`${material.carpenterName}-${material.itemName}-${material.approvedAt}-${index}`} className="border-b border-[#EAE2D2] last:border-0">
+                      <td className="px-4 py-2 text-[#2A2724]">{material.carpenterName}</td>
+                      <td className="px-4 py-2 text-[#2A2724]">{material.itemName}</td>
+                      <td className="px-4 py-2 text-[#2A2724]">{material.quantity}</td>
+                      <td className="px-4 py-2 text-[#2A2724]">{material.unit}</td>
+                      <td className="px-4 py-2 text-[#2A2724]">{material.approvedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </main>
