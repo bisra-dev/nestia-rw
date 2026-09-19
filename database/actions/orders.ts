@@ -12,6 +12,35 @@ import StatusUpdateEmail from "@/emails/status/email";
 
 type OrderStatus = "Frame" | "Upholstery" | "Finished";
 
+async function sendFinishedOrderEmail(order: typeof orders.$inferSelect) {
+  const [boss] = await db
+    .select({ email: admins.email })
+    .from(admins)
+    .where(eq(admins.role, 'boss'));
+
+  if (!boss?.email) {
+    throw new Error('No admin with role "boss" found');
+  }
+
+  const result = await resend.emails.send({
+    from: "Nestia Furniture <onboarding@resend.dev>",
+    to: boss.email,
+    subject: `Order #${order.id} finished`,
+    react: FinishedOrderEmail({
+      id: order.id,
+      fullName: order.fullName,
+      description: order.description,
+      updatedAt: order.updatedAt
+        ? new Date(order.updatedAt).toISOString()
+        : new Date().toISOString(),
+    }),
+  });
+
+  if (result.error) {
+    throw new Error(`Finished order email failed: ${result.error.message}`);
+  }
+}
+
 export async function createOrder(formData: FormData) {
   try {
     const FullName = formData.get('fullName') as string;
@@ -27,6 +56,10 @@ export async function createOrder(formData: FormData) {
       buildPhotographyUrl: buildPhotographyUrl,
       status: status,
     }).returning();
+
+    if (newOrder.status === 'Finished') {
+      await sendFinishedOrderEmail(newOrder);
+    }
 
     //Order confimation email
     try {
@@ -193,33 +226,13 @@ export async function updateOrder(orderId: string, formData: FormData) {
       }
     }
 
-    // General Manager email — only when the order became "finished"
+    // General Manager email — only when the order becomes "Finished"
     if (statusChanged && status === 'Finished') {
       try {
-        const [gm] = await db
-          .select({ email: admins.email })
-          .from(admins)
-          .where(eq(admins.role, 'boss'));
-
-        if (gm?.email) {
-          await resend.emails.send({
-            from: "Nestia Furniture <onboarding@resend.dev>",
-            to: gm.email,
-            subject: `Order #${updated.id} finished`,
-            react: FinishedOrderEmail({
-              id: updated.id,
-              fullName: updated.fullName, 
-              description: updated.description,
-              updatedAt: updated.updatedAt
-                ? new Date(updated.updatedAt).toISOString()
-                : new Date().toISOString(),
-            }),
-          });
-        } else {
-          console.error('No admin with role "boss" found — GM email not sent');
-        }
+        await sendFinishedOrderEmail(updated);
       } catch (emailError) {
         console.error('General manager email failed to send:', emailError);
+        return { success: false, error: (emailError as Error).message };
       }
     }
 

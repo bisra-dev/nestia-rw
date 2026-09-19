@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-lg rounded-lg bg-gray-200 p-12 shadow-sm shadow-[#16171C]"
       >
-        <h2 className="text-3xl font-bold normal-case text-[#16171C] mb-6">Nestia Admin</h2>
+        <h2 className="text-3xl font-bold normal-case text-[#16171C] mb-6">Nestia Furniture</h2>
 
         {error && (
           <p className="mb-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>

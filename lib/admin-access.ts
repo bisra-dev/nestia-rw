@@ -64,7 +64,7 @@ export function isRouteAllowedForRole(role: AdminRole | string | null | undefine
 export function getAllowedNavItems(role: AdminRole | string | null | undefined) {
   const baseItems = [
     { label: "Dashboard", href: "/admin" },
-    { label: "Create New Order", href: "/admin/orders" },
+    { label: "New Order", href: "/admin/orders" },
     { label: "Manager", href: "/admin/shop-manager" },
     { label: "Carpenter", href: "/admin/carpenter" },
     { label: "Frame", href: "/admin/frame" },

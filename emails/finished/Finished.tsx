@@ -33,13 +33,13 @@ export const FinishedOrderEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>GENERAL MANAGER : #{id} is FINISHED</Preview>
+      <Preview>JOB COMPLETED : #{id} is FINISHED</Preview>
       <Tailwind>
         <Body className="bg-slate-100 font-sans my-auto mx-auto font-normal">
           <Container className="border border-solid border-slate-200 rounded my-10 mx-auto p-5 max-w-150 bg-white">
             <Section className="bg-[#082D34] px-6 py-4">
             <Heading className="text-white text-lg font-bold p-0 mx-0 leading-tight">
-              GENERAL MANAGER : <span className="text-[#6b7280]">#{id}</span> FINISHED
+              JOB COMPLETED : <span className="text-[#6b7280]">#{id}</span> FINISHED
             </Heading>
             </Section>
             

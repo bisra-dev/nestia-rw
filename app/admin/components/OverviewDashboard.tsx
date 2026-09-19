@@ -71,7 +71,7 @@ export default function OverviewDashboard({
 
       <section className="bg-white border border-[#EAE7E1] rounded-xl shadow-sm overflow-hidden">
         <div className="p-5 border-b border-[#EAE7E1] bg-white">
-          <h2 className="text-sm font-semibold tracking-wider text-[#2A2724] uppercase">Order Master Table</h2>
+          <h2 className="text-sm font-semibold tracking-wider text-[#2A2724] uppercase">Orders Table</h2>
         </div>
         <div className="overflow-x-auto">
           <div className="sm:hidden divide-y divide-[#F4F2EE]">

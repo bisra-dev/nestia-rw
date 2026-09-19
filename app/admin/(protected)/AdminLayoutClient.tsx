@@ -47,7 +47,7 @@ export default function AdminLayoutClient({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 whitespace-nowrap rounded-lg text-sm transition-colors ${
                   isActive
                     ? "bg-[#16171C] text-white font-medium"
                     : "text-[#16171C] hover:bg-[#FAF9F6] hover:text-[#16171C]"
